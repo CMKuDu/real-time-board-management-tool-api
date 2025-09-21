@@ -1,0 +1,17 @@
+# Node modules
+node_modules/
+
+# Env files
+.env
+
+# Firebase / Google service account
+src/config/keys/key.json
+
+# Logs
+*.log
+
+# MacOS
+.DS_Store
+
+# Optional: Build output
+dist/
