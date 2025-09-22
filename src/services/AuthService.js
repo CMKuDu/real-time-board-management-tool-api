@@ -140,7 +140,6 @@ class AuthService {
     }
 
     const token = this.generateJWT({ uid: user.uid, email: user.email });
-    console.log(token);
     
     return { user, token };
   }
