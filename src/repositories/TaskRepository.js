@@ -1,4 +1,4 @@
-const db = require('../config/firebase')
+const{db} = require('../config/firebase')
 const Task = require('../models/Task')
 
 class TaskRepository {
@@ -82,3 +82,4 @@ class TaskRepository {
         await taskRef.update({ githubAttachments: task.githubAttachments, updatedAt: new Date() });
     }
 }
+module.exports = TaskRepository;

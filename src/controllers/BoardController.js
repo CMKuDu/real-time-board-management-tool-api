@@ -14,7 +14,7 @@ class BoardController {
 
     async getAllBoards(req, res) {
         try {
-            const ownerId = req.user.id;
+            const ownerId = 'test-user-id-123';
             const boards = await boardService.getAllBoards(ownerId);
             res.status(200).json(boards);
         } catch (err) {

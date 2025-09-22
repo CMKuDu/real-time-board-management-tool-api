@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router({ mergeParams: true });
 const cardController = require('../controllers/CardController');
-const { authenticateToken } = require('../middlewares/auth.middleware');
+const { authenticateToken } = require('../middleware/auth');
 
 router.post('/', authenticateToken, cardController.createCard);
 router.get('/', authenticateToken, cardController.getAllCards);

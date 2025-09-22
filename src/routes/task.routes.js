@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router({ mergeParams: true });
 const taskController = require('../controllers/TaskController');
-const { authenticateToken } = require('../middlewares/auth.middleware');
+const { authenticateToken } = require('../middleware/auth');
 
 // CRUD task
 router.post('/', authenticateToken, taskController.createTask);

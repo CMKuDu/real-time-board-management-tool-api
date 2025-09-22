@@ -10,12 +10,18 @@ class BoardRepository {
     const docRef = this.collection.doc();
     const newBoard = new Board({ ...board, id: docRef.id });
     await docRef.set(newBoard.toJSON());
-    return newBoard.toJSON();
+    const { id, name, description } = newBoard;
+    return { id, name, description }
   }
 
   async getAllBoards(ownerId) {
-    const snapshot = await this.collection.where('ownerId', '==', ownerId).get();
-    return snapshot.docs.map(doc => doc.data());
+    const snapshot = await this.collection
+      .where('ownerId', '==', ownerId)
+      .get();
+    return snapshot.docs.map(doc => {
+      const { id, name, description } = doc.data();
+      return { id, name, description };
+    });
   }
 
   async getBoardById(id) {
