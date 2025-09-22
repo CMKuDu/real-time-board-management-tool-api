@@ -1,7 +1,10 @@
 const User = require('../models/User');
-const { auth } = require('../config/firebase');
+const { db, auth } = require('../config/firebase');
 
 class UserRepository {
+    constructor() {
+        this.usersCollection = db.collection('users');
+    }
     async createUser(userData) {
         try {
             const userRecord = await auth.createUser({
@@ -9,21 +12,32 @@ class UserRepository {
                 password: userData.password,
                 displayName: userData.displayName,
             });
-            const user = new User({
+
+            if (!userRecord.uid) {
+                throw new Error("Firebase UID is undefined, cannot create Firestore document");
+            }
+
+            const userObj = {
                 uid: userRecord.uid,
                 email: userData.email,
                 displayName: userData.displayName,
                 emailVerified: userRecord.emailVerified
-            });
-            await user.save();
-            return user;
+            };
+
+            await this.usersCollection.doc(userRecord.uid).set(userObj);
+
+            return userObj; 
         } catch (error) {
             console.log("something wrong with Auth", error);
             throw new Error(`Error creating user: ${error.message}`);
         }
     }
+
     async getUserByEmail(email) {
-        return await User.findByEmail(email);
+        const snapshot = await this.usersCollection.where('email', '==', email).get();
+        if (snapshot.empty) return null;
+        const doc = snapshot.docs[0];
+        return { uid: doc.id, ...doc.data() };
     }
 
     async getUserByUid(uid) {
@@ -50,17 +64,30 @@ class UserRepository {
 
     async deleteUser(uid) {
         try {
-            // Delete from Firebase Auth
             await auth.deleteUser(uid);
 
-            // Delete from Firestore
-            await User.delete(uid);
+            await this.usersCollection.doc(uid).delete();
+
             return true;
         } catch (error) {
+            console.log('Error deleting user:', error);
             throw new Error(`Error deleting user: ${error.message}`);
         }
     }
+    async deleteUserByEmail(email) {
+        try {
+            const userRecord = await auth.getUserByEmail(email);
+            const uid = userRecord.uid;
 
+            await auth.deleteUser(uid);
+
+            await this.usersCollection.doc(uid).delete();
+
+            return { message: `User ${email} deleted successfully` };
+        } catch (error) {
+            throw new Error(error.message);
+        }
+    }
     async verifyFirebaseToken(idToken) {
         try {
             const decodedToken = await auth.verifyIdToken(idToken);

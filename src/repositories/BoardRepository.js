@@ -27,8 +27,7 @@ class BoardRepository {
   async getBoardById(id) {
     const doc = await this.collection.doc(id).get();
     if (!doc.exists) throw new Error('Board not found');
-    const { id, name, description } = doc.data();
-    return { id, name, description };
+    return doc.data();
   }
 
   async updateBoard(id, data) {

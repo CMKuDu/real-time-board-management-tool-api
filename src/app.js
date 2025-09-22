@@ -1,4 +1,5 @@
 const express = require("express");
+const cors = require("cors");
 const app = express();
 const authRoutes = require("./routes/auth.routes");
 const boardRoutes = require("./routes/board.routes");
@@ -9,7 +10,15 @@ const boardInvite = require("./routes/boardInvite.routes");
 
 // Middleware
 app.use(express.json());
-
+app.use(cors({
+  origin: [
+    "http://localhost:3000",  // Next.js dev server
+    "http://localhost:3001",  // Backend
+  ],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'Cookie']
+}));
 // Routes
 app.get("/", (req, res) => {
   res.send("Hello from Express App!");
